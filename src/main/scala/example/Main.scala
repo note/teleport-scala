@@ -16,11 +16,11 @@ final case class GotoCmdOptions(name: String)                          extends C
 final case object VersionCmdOptions                                    extends CmdOptions
 
 object Commands {
-  def nameOpt = Opts.argument[String]("NAME")
+  val nameOpt = Opts.argument[String]("NAME")
 
   // TODO: add no-color option?
 
-  def add =
+  val add =
     Command(
       name = "add",
       header = "add a teleport point"
@@ -29,7 +29,7 @@ object Commands {
       (nameOpt, Opts.argument[Path]("FOLDERPATH").orNone).mapN(AddCmdOptions)
     }
 
-  def list =
+  val list =
     Command(
       name = "list",
       header = "list all teleport points"
@@ -37,7 +37,7 @@ object Commands {
       Opts.unit.map(_ => ListCmdOptions)
     }
 
-  def remove =
+  val remove =
     Command(
       name = "remove",
       header = "remove a teleport point"
@@ -45,7 +45,7 @@ object Commands {
       nameOpt.map(RemoveCmdOptions)
     }
 
-  def goto =
+  val goto =
     Command(
       name = "goto",
       header = "go to a created teleport point"
@@ -53,7 +53,7 @@ object Commands {
       nameOpt.map(GotoCmdOptions)
     }
 
-  def version =
+  val version =
     Command(
       name = "version",
       header = "display version"
