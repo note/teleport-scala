@@ -1,6 +1,6 @@
 import com.softwaremill.SbtSoftwareMill.autoImport.{commonSmlBuildSettings, ossPublishSettings, wartRemoverSettings}
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
-import sbt.Keys.{name, organization, scalaVersion, version}
+import sbt.Keys._
 import sbt.Project
 
 object Common {
@@ -14,7 +14,11 @@ object Common {
       scalafmtOnCompile := true,
 
       commonSmlBuildSettings,
-      wartRemoverSettings
+      wartRemoverSettings,
+
+//      scalacOptions ++= Seq(
+//        "-Xfatal-warnings"
+//      )
     )
   }
 }
