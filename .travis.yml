@@ -16,10 +16,7 @@ before_install:
 
 install:
 #  - if [ $TRAVIS_TAG != "" ]; then native-image --version ; fi
-  - sdk current java
-  - echo $JAVA_HOME
-  - sdk current java | grep '19.3.1.r11-grl' || sdk install java 19.3.1.r11-grl
-  - echo $JAVA_HOME
+  - sdk install java 19.3.1.r11-grl
   - gu install native-image
   - native-image --version
   - sdk install sbt
