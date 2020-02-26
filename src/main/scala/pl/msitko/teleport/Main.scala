@@ -1,66 +1,9 @@
 package pl.msitko.teleport
 
-import java.nio.file.Path
-
 import cats.effect.ExitCase.Canceled
 import cats.effect._
 import cats.syntax.all._
 import com.monovore.decline._
-
-sealed trait CmdOptions extends Product with Serializable
-
-final case class AddCmdOptions(name: String, folderPath: Option[Path]) extends CmdOptions
-final case object ListCmdOptions                                       extends CmdOptions
-final case class RemoveCmdOptions(name: String)                        extends CmdOptions
-final case class GotoCmdOptions(name: String)                          extends CmdOptions
-final case object VersionCmdOptions                                    extends CmdOptions
-
-object Commands {
-  val nameOpt = Opts.argument[String]("NAME")
-
-  // TODO: add no-color option?
-
-  val add =
-    Command(
-      name = "add",
-      header = "add a teleport point"
-    ) {
-      // TODO: should we use refined for NonEmptyString?
-      (nameOpt, Opts.argument[Path]("FOLDERPATH").orNone).mapN(AddCmdOptions)
-    }
-
-  val list =
-    Command(
-      name = "list",
-      header = "list all teleport points"
-    ) {
-      Opts.unit.map(_ => ListCmdOptions)
-    }
-
-  val remove =
-    Command(
-      name = "remove",
-      header = "remove a teleport point"
-    ) {
-      nameOpt.map(RemoveCmdOptions)
-    }
-
-  val goto =
-    Command(
-      name = "goto",
-      header = "go to a created teleport point"
-    ) {
-      nameOpt.map(GotoCmdOptions)
-    }
-
-  val version =
-    Command(
-      name = "version",
-      header = "display version"
-    ) {
-      Opts.unit.map(_ => VersionCmdOptions)
-    }
-}
 
 object Main extends IOApp {
 
@@ -75,8 +18,47 @@ object Main extends IOApp {
     val command: Command[CmdOptions] = Command(name = "", header = "")(allSubCommands)
 
     val res = command.parse(args) match {
-      case Right(_) => IO(println("OK")) *> IO(ExitCode.Success)
-      case Left(e)  => IO(println(s"error: ${e.toString}")) *> IO(ExitCode.Error)
+      case Right(cmd: AddCmdOptions)    =>
+        Handler.add(cmd).map {
+          case Right(tpPoint) =>
+            println("Creating teleport point:")
+            println(tpPoint.fansi)
+            ExitCode.Success
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case Right(cmd @ ListCmdOptions)        =>
+        Handler.list(cmd).map { tpPoints =>
+          println("teleport points: " + fansi.Color.LightBlue(s"(total ${tpPoints.size})"))
+          tpPoints.map(_.fansi).foreach(println)
+          IO(ExitCode.Success)
+        }
+
+      case Right(cmd: RemoveCmdOptions) =>
+        Handler.remove(cmd).map {
+          case Right(tpPoint) =>
+            println(s"removed teleport point [${fansi.Color.LightBlue(cmd.name)}]")
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case Right(cmd: GotoCmdOptions)   =>
+        Handler.goto(cmd).map {
+          case Right(absolutePath) =>
+            println(absolutePath)
+            ExitCode(2)
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case Right(VersionCmdOptions) =>
+        IO(println(BuildInfo.version)) *> IO(ExitCode.Success)
+
+      case Left(e) => IO(println(s"error: ${e.toString}")) *> IO(ExitCode.Error)
     }
 
     val program = IO(println(fansi.Color.LightBlue("Welcome!"))) *> res
