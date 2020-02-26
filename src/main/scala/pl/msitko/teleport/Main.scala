@@ -1,4 +1,4 @@
-package example
+package pl.msitko.teleport
 
 import java.nio.file.Path
 

@@ -1,4 +1,4 @@
-package example
+package pl.msitko.teleport
 
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.wordspec.AnyWordSpec
