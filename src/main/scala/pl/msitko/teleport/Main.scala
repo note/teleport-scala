@@ -17,7 +17,7 @@ object Main extends IOApp {
 
     val command: Command[CmdOptions] = Command(name = "", header = "")(allSubCommands)
 
-    implicit val storage = Storage
+    implicit val storage = new Storage(os.pwd / ".teleport-data")
 
     val program = command.parse(args) match {
       case Right(cmd: AddCmdOptions) =>
