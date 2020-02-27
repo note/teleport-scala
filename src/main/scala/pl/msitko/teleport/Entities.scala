@@ -22,6 +22,10 @@ final case class TeleportState(points: List[TeleportPoint]) extends AnyVal {
   def prepend(t: TeleportPoint): TeleportState = copy(points = t :: points)
 }
 
+object TeleportState {
+  def empty: TeleportState = TeleportState(points = List.empty)
+}
+
 //object Codecs {
 //  implicit val teleportPointCodec = deriveCodec[TeleportPoint]
 //  implicit val teleportStateCodec = deriveCodec[TeleportState]

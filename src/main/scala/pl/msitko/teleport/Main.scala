@@ -8,17 +8,9 @@ import com.monovore.decline._
 object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
-    val allSubCommands = Opts
-      .subcommand(Commands.add)
-      .orElse(Opts.subcommand(Commands.list))
-      .orElse(Opts.subcommand(Commands.remove))
-      .orElse(Opts.subcommand(Commands.goto))
-      .orElse(Opts.subcommand(Commands.version))
-
-    val command: Command[CmdOptions] = Command(name = "", header = "")(allSubCommands)
-
-    val storage = new Storage(os.pwd / ".teleport-data")
-    val handler = new Handler(storage)
+    val command: Command[CmdOptions] = Command(name = "", header = "")(Commands.allSubCommands)
+    val storage                      = new Storage(os.pwd / ".teleport-data")
+    val handler                      = new Handler(storage)
 
     val program = command.parse(args) match {
       case Right(cmd: AddCmdOptions) =>

@@ -15,10 +15,15 @@ final case class TeleportException(msg: String, underlying: Option[Exception])
 class Storage(location: Path) {
 
   def read(): IO[TeleportState] =
-    IO(os.read(location)).flatMap { content =>
-      IO.fromEither(parse(content).flatMap(parsed => parsed.as[TeleportState]).leftMap { e =>
-        TeleportException(e.getMessage, e.some)
-      })
+    IO(os.exists(location)).flatMap {
+      case true =>
+        IO(os.read(location)).flatMap { content =>
+          IO.fromEither(parse(content).flatMap(parsed => parsed.as[TeleportState]).leftMap { e =>
+            TeleportException(e.getMessage, e.some)
+          })
+        }
+      case false =>
+        TeleportState.empty.pure[IO]
     }
 
   def write(state: TeleportState): IO[Unit] = {

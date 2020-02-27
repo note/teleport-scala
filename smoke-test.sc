@@ -1,4 +1,5 @@
 import $ivy.`com.lihaoyi::os-lib:0.6.3`
+import $ivy.`com.lihaoyi::os-lib:0.2.9`
 
 val testDir = os.pwd / "teleport_guinea_pig"
 
@@ -22,9 +23,10 @@ try {
   assert(r.find(_.contains("tpoint0")).isDefined, "tpoint0 expected on list")
   assert(r.find(_.contains("tpointX")).isEmpty, "tpointX not expected on list")
 
+  println(fansi.Color.Green("Smoke test succeeded"))
 } catch {
   case e: Throwable =>
-    println(s"Failure: $e, ${e.getMessage}")
+    println(fansi.Color.Red("Smoke test failed") + s": $e, ${e.getMessage}")
     e.printStackTrace()
     os.remove.all(testDir)
     sys.exit(1)
@@ -35,7 +37,7 @@ try {
 
 def verify(arguments: List[String], expectedExitCode: Int): Vector[String] = {
   val cmd = "../teleport-scala"
-  val res = os.proc(cmd :: arguments).call(cwd = os.pwd / "teleport_guinea_pig")
+  val res = os.proc(cmd :: arguments).call(cwd = os.pwd / "teleport_guinea_pig", check = false)
   assert(res.exitCode == expectedExitCode, s"Unexpected status code: ${res.exitCode}, expected: ${expectedExitCode} for $cmd")
   res.out.lines
 }

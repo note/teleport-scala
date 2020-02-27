@@ -3,3 +3,5 @@ target
 .DS_Store
 *.bloop
 *.metals
+.ammonite
+.bash_history

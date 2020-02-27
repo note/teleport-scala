@@ -57,4 +57,12 @@ object Commands {
     ) {
       Opts.unit.map(_ => VersionCmdOptions)
     }
+
+  val allSubCommands = Opts
+    .subcommand(Commands.add)
+    .orElse(Opts.subcommand(Commands.list))
+    .orElse(Opts.subcommand(Commands.remove))
+    .orElse(Opts.subcommand(Commands.goto))
+    .orElse(Opts.subcommand(Commands.version))
+
 }
