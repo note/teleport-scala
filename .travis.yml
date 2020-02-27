@@ -4,6 +4,10 @@ jobs:
     - os: linux
       env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
 
+branches:
+  only:
+    - master
+
 before_install:
   # adding $HOME/.sdkman to cache would create an empty directory, which interferes with the initial installation
   - "[[ -d $HOME/.sdkman/ ]] && [[ -d $HOME/.sdkman/bin/ ]] || rm -rf $HOME/.sdkman/"
@@ -16,19 +20,13 @@ before_install:
 
 install:
 #  - if [ $TRAVIS_TAG != "" ]; then native-image --version ; fi
-  - sdk current java
-  - echo $JAVA_HOME
-  - sdk current java | grep '19.3.1.r11-grl' || sdk install java 19.3.1.r11-grl
-  - echo $JAVA_HOME
+  - sdk install java 19.3.1.r11-grl
   - gu install native-image
   - native-image --version
   - sdk install sbt
 
 script:
-  - java -version
-  - sbt assembly
-  # TODO: unhardcode artifact version
-  - native-image --verbose --static --no-fallback -jar target/scala-2.13/teleport-scala-assembly-0.1.0.jar teleport-scala
+  - ./ci/script.sh
 
 deploy:
   provider: releases

@@ -5,10 +5,9 @@ import sbt.Project
 
 object Common {
   implicit class ProjectFrom(project: Project) {
-    def commonSettings(nameArg: String, versionArg: String): Project = project.settings(
+    def commonSettings(nameArg: String): Project = project.settings(
       name := nameArg,
       organization := "pl.msitko",
-      version := versionArg,
 
       scalaVersion := "2.13.1",
       scalafmtOnCompile := true,
