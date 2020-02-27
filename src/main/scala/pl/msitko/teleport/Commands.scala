@@ -1,9 +1,7 @@
 package pl.msitko.teleport
 
-import java.nio.file.Path
-
-import com.monovore.decline.{Command, Opts}
 import cats.syntax.all._
+import com.monovore.decline.{Command, Opts}
 
 sealed trait CmdOptions extends Product with Serializable
 
@@ -59,4 +57,12 @@ object Commands {
     ) {
       Opts.unit.map(_ => VersionCmdOptions)
     }
+
+  val allSubCommands = Opts
+    .subcommand(Commands.add)
+    .orElse(Opts.subcommand(Commands.list))
+    .orElse(Opts.subcommand(Commands.remove))
+    .orElse(Opts.subcommand(Commands.goto))
+    .orElse(Opts.subcommand(Commands.version))
+
 }
