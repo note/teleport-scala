@@ -24,8 +24,7 @@ install:
 script:
   - java -version
   - sbt assembly
-  # TODO: unhardcode artifact version
-  - native-image --verbose --static --no-fallback -jar target/scala-2.13/teleport-scala-assembly-0.1.0.jar teleport-scala
+  - native-image --verbose --static --no-fallback -jar "target/scala-2.13/teleport-scala-assembly-$TRAVIS_TAG.jar" teleport-scala
 
 deploy:
   provider: releases
