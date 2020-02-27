@@ -4,6 +4,10 @@ jobs:
     - os: linux
       env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
 
+branches:
+  only:
+    - master
+
 before_install:
   # adding $HOME/.sdkman to cache would create an empty directory, which interferes with the initial installation
   - "[[ -d $HOME/.sdkman/ ]] && [[ -d $HOME/.sdkman/bin/ ]] || rm -rf $HOME/.sdkman/"
@@ -24,6 +28,7 @@ install:
 script:
   - java -version
   - sbt assembly
+  # For non-tag builds we will end upt with ugly name `...assembly-.jar` but we don't care as it won't be published anywhere
   - native-image --verbose --static --no-fallback -jar "target/scala-2.13/teleport-scala-assembly-$TRAVIS_TAG.jar" teleport-scala
 
 deploy:
