@@ -7,11 +7,12 @@ import cats.syntax.all._
 
 sealed trait CmdOptions extends Product with Serializable
 
-final case class AddCmdOptions(name: String, folderPath: Option[Path]) extends CmdOptions
-final case object ListCmdOptions                                       extends CmdOptions
-final case class RemoveCmdOptions(name: String)                        extends CmdOptions
-final case class GotoCmdOptions(name: String)                          extends CmdOptions
-final case object VersionCmdOptions                                    extends CmdOptions
+// folderPath - which type it should be of?
+final case class AddCmdOptions(name: String, folderPath: Option[String]) extends CmdOptions
+final case object ListCmdOptions                                         extends CmdOptions
+final case class RemoveCmdOptions(name: String)                          extends CmdOptions
+final case class GotoCmdOptions(name: String)                            extends CmdOptions
+final case object VersionCmdOptions                                      extends CmdOptions
 
 object Commands {
   val nameOpt = Opts.argument[String]("NAME")
@@ -24,7 +25,7 @@ object Commands {
       header = "add a teleport point"
     ) {
       // TODO: should we use refined for NonEmptyString?
-      (nameOpt, Opts.argument[Path]("FOLDERPATH").orNone).mapN(AddCmdOptions)
+      (nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions)
     }
 
   val list =

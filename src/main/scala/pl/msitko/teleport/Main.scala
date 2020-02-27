@@ -17,8 +17,10 @@ object Main extends IOApp {
 
     val command: Command[CmdOptions] = Command(name = "", header = "")(allSubCommands)
 
-    val res = command.parse(args) match {
-      case Right(cmd: AddCmdOptions)    =>
+    implicit val storage = Storage
+
+    val program = command.parse(args) match {
+      case Right(cmd: AddCmdOptions) =>
         Handler.add(cmd).map {
           case Right(tpPoint) =>
             println("Creating teleport point:")
@@ -29,23 +31,24 @@ object Main extends IOApp {
             ExitCode.Error
         }
 
-      case Right(cmd @ ListCmdOptions)        =>
-        Handler.list(cmd).map { tpPoints =>
-          println("teleport points: " + fansi.Color.LightBlue(s"(total ${tpPoints.size})"))
-          tpPoints.map(_.fansi).foreach(println)
-          IO(ExitCode.Success)
+      case Right(cmd: ListCmdOptions.type) =>
+        Handler.list(cmd).map { state =>
+          println("teleport points: " + fansi.Color.LightBlue(s"(total ${state.points.size})"))
+          state.points.map(_.fansi).foreach(println)
+          ExitCode.Success
         }
 
       case Right(cmd: RemoveCmdOptions) =>
         Handler.remove(cmd).map {
-          case Right(tpPoint) =>
+          case Right(_) =>
             println(s"removed teleport point [${fansi.Color.LightBlue(cmd.name)}]")
+            ExitCode.Success
           case Left(err) =>
             println(err.fansi)
             ExitCode.Error
         }
 
-      case Right(cmd: GotoCmdOptions)   =>
+      case Right(cmd: GotoCmdOptions) =>
         Handler.goto(cmd).map {
           case Right(absolutePath) =>
             println(absolutePath)
@@ -61,13 +64,12 @@ object Main extends IOApp {
       case Left(e) => IO(println(s"error: ${e.toString}")) *> IO(ExitCode.Error)
     }
 
-    val program = IO(println(fansi.Color.LightBlue("Welcome!"))) *> res
-
+    // if program has any resource they can be released here:
     program.guaranteeCase {
       case Canceled =>
-        IO(println("Interrupted: releasing and exiting!"))
+        IO.unit
       case _ =>
-        IO(println("Normal exit!"))
+        IO.unit
     }
   }
 }
