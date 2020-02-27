@@ -15,9 +15,10 @@ object Common {
       commonSmlBuildSettings,
       wartRemoverSettings,
 
-//      scalacOptions ++= Seq(
-//        "-Xfatal-warnings"
-//      )
+      scalacOptions ++= Seq(
+        "-Ymacro-annotations",
+        "-Xfatal-warnings"
+      )
     )
   }
 }

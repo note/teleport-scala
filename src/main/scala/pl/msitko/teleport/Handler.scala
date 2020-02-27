@@ -13,11 +13,13 @@ final case class DirectoryDoesNotExists(path: Path) extends TeleportError {
   override def fansi: Str = _root_.fansi.Color.Red(s"User error: directory $path does not exists")
 }
 
-final case class IsFile(path: Path)                 extends TeleportError {
-  override def fansi: Str = _root_.fansi.Color.Red(s"User error: $path is a file but teleport expects is to be a directory")
+final case class IsFile(path: Path) extends TeleportError {
+
+  override def fansi: Str =
+    _root_.fansi.Color.Red(s"User error: $path is a file but teleport expects is to be a directory")
 }
 
-final case class TeleportPointNotFound(name: String)              extends TeleportError {
+final case class TeleportPointNotFound(name: String) extends TeleportError {
   override def fansi: Str = _root_.fansi.Color.Red(s"User error: teleport point $name does not exist")
 }
 
@@ -25,30 +27,29 @@ class Handler(storage: Storage) {
 
   def add(cmd: AddCmdOptions): IO[Either[TeleportError, TeleportPoint]] = {
     val path = cmd.folderPath.fold(os.pwd)(os.pwd / _)
-    if (os.exists(path)) {
-      if (os.isDir(path)) {
-        for {
-          state <- storage.read()
-          newPoint = TeleportPoint(cmd.name, path)
-          newState = state.prepend(newPoint)
-          _ <- storage.write(newState)
-        } yield newPoint.asRight
-      } else {
-        IsFile(path).asLeft.pure[IO]
-      }
+    if (os.exists(path)) if (os.isDir(path)) {
+      for {
+        state <- storage.read()
+        newPoint = TeleportPoint(cmd.name, path)
+        newState = state.prepend(newPoint)
+        _ <- storage.write(newState)
+      } yield newPoint.asRight
     } else {
+      IsFile(path).asLeft.pure[IO]
+    }
+    else {
       DirectoryDoesNotExists(path).asLeft.pure[IO]
     }
   }
 
   // TODO: define ordering
-  def list(cmd: ListCmdOptions.type): IO[TeleportState] = storage.read()
+  def list(): IO[TeleportState] = storage.read()
 
   def remove(cmd: RemoveCmdOptions): IO[Either[TeleportError, Unit]] =
     for {
       currentState <- storage.read()
-      (toBeRemoved, updated)  = currentState.points.partition(_.name == cmd.name)
-      res <- if(toBeRemoved.isEmpty) {
+      (toBeRemoved, updated) = currentState.points.partition(_.name == cmd.name)
+      res <- if (toBeRemoved.isEmpty) {
         TeleportPointNotFound(cmd.name).asLeft.pure[IO]
       } else {
         storage.write(TeleportState(updated)) *> ().asRight.pure[IO]

@@ -17,11 +17,12 @@ object Main extends IOApp {
 
     val command: Command[CmdOptions] = Command(name = "", header = "")(allSubCommands)
 
-    implicit val storage = new Storage(os.pwd / ".teleport-data")
+    val storage = new Storage(os.pwd / ".teleport-data")
+    val handler = new Handler(storage)
 
     val program = command.parse(args) match {
       case Right(cmd: AddCmdOptions) =>
-        Handler.add(cmd).map {
+        handler.add(cmd).map {
           case Right(tpPoint) =>
             println("Creating teleport point:")
             println(tpPoint.fansi)
@@ -31,15 +32,15 @@ object Main extends IOApp {
             ExitCode.Error
         }
 
-      case Right(cmd: ListCmdOptions.type) =>
-        Handler.list(cmd).map { state =>
+      case Right(ListCmdOptions) =>
+        handler.list().map { state =>
           println("teleport points: " + fansi.Color.LightBlue(s"(total ${state.points.size})"))
           state.points.map(_.fansi).foreach(println)
           ExitCode.Success
         }
 
       case Right(cmd: RemoveCmdOptions) =>
-        Handler.remove(cmd).map {
+        handler.remove(cmd).map {
           case Right(_) =>
             println(s"removed teleport point [${fansi.Color.LightBlue(cmd.name)}]")
             ExitCode.Success
@@ -49,7 +50,7 @@ object Main extends IOApp {
         }
 
       case Right(cmd: GotoCmdOptions) =>
-        Handler.goto(cmd).map {
+        handler.goto(cmd).map {
           case Right(absolutePath) =>
             println(absolutePath)
             ExitCode(2)
