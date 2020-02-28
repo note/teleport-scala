@@ -10,18 +10,21 @@ if(os.exists(testDir)) {
 
 try {
   os.makeDir(testDir)
-  List("a", "b", "c", "d").map(testDir / _).foreach(os.makeDir)
+  List("tdir_a", "tdir_b", "tdir_c").map(testDir / _).foreach(os.makeDir)
 
   verify(List("list"), 0)
 
-  verify(List("add", "tpoint0", "a"), 0)
+  verify(List("add", "tpoint0", "tdir_a"), 0)
+  verify(List("add", "tpoint1", "tdir_b"), 0)
 
   verify(List("add", "tpointX", "nonexistent"), 1)
 
   val r = verify(List("list"), 0)
 
-  assert(r.find(_.contains("tpoint0")).isDefined, "tpoint0 expected on list")
+  assert(r.find(l => l.contains("tpoint0") && l.contains("tdir_a")).isDefined, "tpoint0 expected on list")
+  assert(r.find(l => l.contains("tpoint1") && l.contains("tdir_b")).isDefined, "tpoint1 expected on list")
   assert(r.find(_.contains("tpointX")).isEmpty, "tpointX not expected on list")
+  assert(r.find(_.contains("tpointX")).isEmpty, "nonexistent not expected on list")
 
   println(fansi.Color.Green("Smoke test succeeded"))
 } catch {
