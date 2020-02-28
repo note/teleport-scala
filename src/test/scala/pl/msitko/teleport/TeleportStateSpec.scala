@@ -8,20 +8,20 @@ class TeleportStateSpec extends AnyWordSpec with TypeCheckedTripleEquals {
 
   val initialState = TeleportState(
     List(
-      TeleportPoint("a", os.Path("/home/a")),
-      TeleportPoint("b", os.Path("/home/b")),
-      TeleportPoint("c", os.Path("/home/c"))
+      TeleportPoint("a", os.pwd / "a"),
+      TeleportPoint("b", os.pwd / "b"),
+      TeleportPoint("c", os.pwd / "c")
     ))
 
   "afterRemoval" should {
     "return (Some, newState) in case name already existed in the state" in {
       val expected = TeleportState(
         List(
-          TeleportPoint("a", os.Path("/home/a")),
-          TeleportPoint("c", os.Path("/home/c"))
+          TeleportPoint("a", os.pwd / "a"),
+          TeleportPoint("c", os.pwd / "c")
         ))
 
-      assert(initialState.afterRemoval("b") === (TeleportPoint("b", os.Path("/home/b")).some -> expected))
+      assert(initialState.afterRemoval("b") === (TeleportPoint("b", os.pwd / "b").some -> expected))
     }
 
     "return (None, previousState) in case name already existed in the state" in {
