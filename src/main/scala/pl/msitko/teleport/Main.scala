@@ -9,15 +9,14 @@ object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
     val command: Command[CmdOptions] = Command(name = "", header = "")(Commands.allSubCommands)
-    val storage                      = new Storage(os.pwd / ".teleport-data")
+    val storage                      = new Storage(os.home / ".teleport-data")
     val handler                      = new Handler(storage)
 
     val program = command.parse(args) match {
       case Right(cmd: AddCmdOptions) =>
         handler.add(cmd).map {
           case Right(tpPoint) =>
-            println("Creating teleport point:")
-            println(tpPoint.fansi)
+            println(s"Creating teleport point: ${fansi.Color.LightBlue(tpPoint.name)}")
             ExitCode.Success
           case Left(err) =>
             println(err.fansi)

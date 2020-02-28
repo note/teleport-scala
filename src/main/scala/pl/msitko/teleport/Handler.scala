@@ -5,6 +5,8 @@ import os.Path
 import cats.syntax.all._
 import fansi.Str
 
+import scala.util.Try
+
 sealed trait TeleportError extends Product with Serializable {
   def fansi: _root_.fansi.Str
 }
@@ -20,13 +22,14 @@ final case class IsFile(path: Path) extends TeleportError {
 }
 
 final case class TeleportPointNotFound(name: String) extends TeleportError {
-  override def fansi: Str = _root_.fansi.Color.Red(s"User error: teleport point $name does not exist")
+  override def fansi: Str = _root_.fansi.Color.Red(s"User error: teleport point [$name] does not exist")
 }
 
 class Handler(storage: Storage) {
 
   def add(cmd: AddCmdOptions): IO[Either[TeleportError, TeleportPoint]] = {
-    val path = cmd.folderPath.fold(os.pwd)(os.pwd / _)
+    val absolutePath = cmd.folderPath.map(fp => Try(Path(fp)).getOrElse(os.pwd / fp))
+    val path         = absolutePath.fold(os.pwd)(identity)
     if (os.exists(path)) if (os.isDir(path)) {
       for {
         state <- storage.read()

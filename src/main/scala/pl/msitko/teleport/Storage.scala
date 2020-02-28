@@ -28,6 +28,6 @@ class Storage(location: Path) {
 
   def write(state: TeleportState): IO[Unit] = {
     val content = state.asJson.noSpaces
-    IO(os.write(location, content))
+    IO(os.write.over(location, content))
   }
 }
