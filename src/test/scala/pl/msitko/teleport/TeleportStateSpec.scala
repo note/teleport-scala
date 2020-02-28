@@ -21,11 +21,11 @@ class TeleportStateSpec extends AnyWordSpec with TypeCheckedTripleEquals {
           TeleportPoint("c", os.Path("/home/c"))
         ))
 
-      assert(initialState.afterRemoval("b") === (TeleportPoint("b", os.Path("/home/b")).some, expected))
+      assert(initialState.afterRemoval("b") === (TeleportPoint("b", os.Path("/home/b")).some -> expected))
     }
 
     "return (None, previousState) in case name already existed in the state" in {
-      assert(initialState.afterRemoval("nonexisting") === initialState)
+      assert(initialState.afterRemoval("nonexisting") === (None -> initialState))
     }
   }
 }

@@ -3,16 +3,15 @@ package pl.msitko.teleport
 import cats.syntax.all._
 import com.monovore.decline.{Command, Opts}
 
+final case class GlobalFlags(colors: Boolean, headers: Boolean)
+
 sealed trait CmdOptions extends Product with Serializable
 
-// folderPath - which type it should be of?
 final case class AddCmdOptions(name: String, folderPath: Option[String]) extends CmdOptions
 final case object ListCmdOptions                                         extends CmdOptions
 final case class RemoveCmdOptions(name: String)                          extends CmdOptions
 final case class GotoCmdOptions(name: String)                            extends CmdOptions
 final case object VersionCmdOptions                                      extends CmdOptions
-
-final case class GlobalFlags(colors: Boolean, headers: Boolean)
 
 object Commands {
 
@@ -22,54 +21,56 @@ object Commands {
     (nocolorsOpt, noheadersOpt).mapN((noColors, noHeaders) => GlobalFlags(!noColors, !noHeaders))
   }
 
-  val nameOpt = Opts.argument[String]("NAME")
+  val subcommands = {
+    val nameOpt = Opts.argument[String]("NAME")
 
-  val add =
-    Command(
-      name = "add",
-      header = "add a teleport point"
-    ) {
-      (nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions)
-    }
+    val add =
+      Command(
+        name = "add",
+        header = "add a teleport point"
+      ) {
+        (nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions)
+      }
 
-  val list =
-    Command(
-      name = "list",
-      header = "list all teleport points"
-    ) {
-      Opts.unit.map(_ => ListCmdOptions)
-    }
+    val list =
+      Command(
+        name = "list",
+        header = "list all teleport points"
+      ) {
+        Opts.unit.map(_ => ListCmdOptions)
+      }
 
-  val remove =
-    Command(
-      name = "remove",
-      header = "remove a teleport point"
-    ) {
-      nameOpt.map(RemoveCmdOptions)
-    }
+    val remove =
+      Command(
+        name = "remove",
+        header = "remove a teleport point"
+      ) {
+        nameOpt.map(RemoveCmdOptions)
+      }
 
-  val goto =
-    Command(
-      name = "goto",
-      header = "go to a created teleport point"
-    ) {
-      nameOpt.map(GotoCmdOptions)
-    }
+    val goto =
+      Command(
+        name = "goto",
+        header = "go to a created teleport point"
+      ) {
+        nameOpt.map(GotoCmdOptions)
+      }
 
-  val version =
-    Command(
-      name = "version",
-      header = "display version"
-    ) {
-      Opts.unit.map(_ => VersionCmdOptions)
-    }
+    val version =
+      Command(
+        name = "version",
+        header = "display version"
+      ) {
+        Opts.unit.map(_ => VersionCmdOptions)
+      }
 
-  val subcommands = Opts
-    .subcommand(Commands.add)
-    .orElse(Opts.subcommand(Commands.list))
-    .orElse(Opts.subcommand(Commands.remove))
-    .orElse(Opts.subcommand(Commands.goto))
-    .orElse(Opts.subcommand(Commands.version))
+    Opts
+      .subcommand(add)
+      .orElse(Opts.subcommand(list))
+      .orElse(Opts.subcommand(remove))
+      .orElse(Opts.subcommand(goto))
+      .orElse(Opts.subcommand(version))
+  }
 
   val allSubCommands: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
 

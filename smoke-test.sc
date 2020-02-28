@@ -34,11 +34,11 @@ val tests = Tests{
   }
   Symbol("`--no-headers list` should not contain headers")- {
     val listResult = verify(List("list"), 0)
-    assert(listResult.size == 3, s"size == ${listResult.size}, expected: 3")
+    assert(listResult.size == 3)
 
     val noheadersListResult = verify(List("--no-headers", "list"), 0)
 
-    assert(noheadersListResult.size == 2, s"size == ${noheadersListResult.size}, expected: 2")
+    assert(noheadersListResult.size == 2)
   }
   Symbol("`--no-colors list` should not contain colors") - {
     val colorlessListResult = verify(List("--no-colors", "list"), 0)
@@ -49,15 +49,19 @@ val tests = Tests{
   }
 }
 
-val result = TestRunner.runAndPrint(tests, "teleport-scala")
-val rendered = TestRunner.renderResults(List("teleport-scala" -> result))
+runTests(tests)
 
-println(rendered._1.render)
+def runTests(tests: Tests): Unit = {
+  val result = TestRunner.runAndPrint(tests, "teleport-scala")
+  val rendered = TestRunner.renderResults(List("teleport-scala" -> result))
 
-if(rendered._3 > 0) {
-  sys.exit(1)
-} else {
-  sys.exit(0)
+  println(rendered._1.render)
+
+  if(rendered._3 > 0) {
+    sys.exit(1)
+  } else {
+    sys.exit(0)
+  }
 }
 
 def verify(arguments: List[String], expectedExitCode: Int): Vector[String] = {
@@ -65,9 +69,4 @@ def verify(arguments: List[String], expectedExitCode: Int): Vector[String] = {
   val res = os.proc(cmd :: arguments).call(cwd = os.pwd / "teleport_guinea_pig", check = false)
   scala.Predef.assert(res.exitCode == expectedExitCode, s"Unexpected status code: ${res.exitCode}, expected: ${expectedExitCode} for $cmd")
   res.out.lines
-}
-
-def fail(msg: String) = {
-  println(msg)
-  sys.exit(1)
 }

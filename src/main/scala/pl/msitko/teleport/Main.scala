@@ -30,7 +30,7 @@ object Main extends IOApp {
         IO(println(e.toString())) *> IO(ExitCode.Error)
     }
 
-    // if program has any resource they can be released here:
+    // if program has any resources they can be released here:
     program.guaranteeCase {
       case Canceled =>
         IO.unit

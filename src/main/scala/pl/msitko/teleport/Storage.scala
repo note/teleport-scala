@@ -7,7 +7,6 @@ import cats.syntax.all._
 import io.circe.syntax._
 import pl.msitko.teleport.TeleportState._
 
-// TODO: move somewhere else:
 @SuppressWarnings(Array("org.wartremover.warts.Null")) // integration with java interface (RuntimeException)
 final case class TeleportException(msg: String, underlying: Option[Exception])
     extends RuntimeException(msg, underlying.orNull)
