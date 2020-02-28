@@ -19,12 +19,21 @@ try {
 
   verify(List("add", "tpointX", "nonexistent"), 1)
 
-  val r = verify(List("list"), 0)
+  val listResult = verify(List("list"), 0)
 
-  assert(r.find(l => l.contains("tpoint0") && l.contains("tdir_a")).isDefined, "tpoint0 expected on list")
-  assert(r.find(l => l.contains("tpoint1") && l.contains("tdir_b")).isDefined, "tpoint1 expected on list")
-  assert(r.find(_.contains("tpointX")).isEmpty, "tpointX not expected on list")
-  assert(r.find(_.contains("tpointX")).isEmpty, "nonexistent not expected on list")
+  assert(listResult.find(l => l.contains("tpoint0") && l.contains("tdir_a")).isDefined, "tpoint0 expected on list")
+  assert(listResult.find(l => l.contains("tpoint1") && l.contains("tdir_b")).isDefined, "tpoint1 expected on list")
+  assert(listResult.find(_.contains("tpointX")).isEmpty, "tpointX not expected on list")
+  assert(listResult.find(_.contains("tpointX")).isEmpty, "nonexistent not expected on list")
+
+  println("here:")
+  println(listResult.size)
+
+  assert(listResult.size == 3, s"size == ${listResult.size}, expected: 3")
+
+  val colorlessListResult = verify(List("--no-colors", "list"), 0)
+
+  assert(colorlessListResult.size == 2, s"size == ${colorlessListResult.size}, expected: 2")
 
   println(fansi.Color.Green("Smoke test succeeded"))
 } catch {

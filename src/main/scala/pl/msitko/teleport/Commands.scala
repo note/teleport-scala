@@ -12,17 +12,23 @@ final case class RemoveCmdOptions(name: String)                          extends
 final case class GotoCmdOptions(name: String)                            extends CmdOptions
 final case object VersionCmdOptions                                      extends CmdOptions
 
-object Commands {
-  val nameOpt = Opts.argument[String]("NAME")
+final case class GlobalFlags(colors: Boolean, headers: Boolean)
 
-  // TODO: add no-color option?
+object Commands {
+
+  val flags = {
+    val nocolorsOpt  = booleanFlag("no-colors", help = "Disable ANSI color codes")
+    val noheadersOpt = booleanFlag("no-headers", help = "Disable printing headers for tabular data")
+    (nocolorsOpt, noheadersOpt).mapN((noColors, noHeaders) => GlobalFlags(!noColors, !noHeaders))
+  }
+
+  val nameOpt = Opts.argument[String]("NAME")
 
   val add =
     Command(
       name = "add",
       header = "add a teleport point"
     ) {
-      // TODO: should we use refined for NonEmptyString?
       (nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions)
     }
 
@@ -58,11 +64,16 @@ object Commands {
       Opts.unit.map(_ => VersionCmdOptions)
     }
 
-  val allSubCommands = Opts
+  val subcommands = Opts
     .subcommand(Commands.add)
     .orElse(Opts.subcommand(Commands.list))
     .orElse(Opts.subcommand(Commands.remove))
     .orElse(Opts.subcommand(Commands.goto))
     .orElse(Opts.subcommand(Commands.version))
+
+  val allSubCommands: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
+
+  private def booleanFlag(long: String, help: String): Opts[Boolean] =
+    Opts.flag(long = long, help = help).map(_ => true).withDefault(false)
 
 }

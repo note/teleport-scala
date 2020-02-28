@@ -8,52 +8,26 @@ import com.monovore.decline._
 object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
-    val command: Command[CmdOptions] = Command(name = "", header = "")(Commands.allSubCommands)
-    val storage                      = new Storage(os.home / ".teleport-data")
-    val handler                      = new Handler(storage)
+
+    // TODO: add comment that global flags have to go before subcommand
+    val command: Command[(GlobalFlags, CmdOptions)] = Command(
+      name = "teleport-scala",
+      header = "teleport: A tool to quickly switch between directories",
+      helpFlag = true)(Commands.allSubCommands)
+    val storage = new Storage(os.home / ".teleport-data")
+    val handler = new Handler(storage)
 
     val program = command.parse(args) match {
-      case Right(cmd: AddCmdOptions) =>
-        handler.add(cmd).map {
-          case Right(tpPoint) =>
-            println(s"Creating teleport point: ${fansi.Color.LightBlue(tpPoint.name)}")
-            ExitCode.Success
-          case Left(err) =>
-            println(err.fansi)
-            ExitCode.Error
+      case Right((globalFlags, cmd)) =>
+        val style = if (globalFlags.colors) {
+          DefaultStyle
+        } else {
+          NoColorsStyle
         }
+        dispatchCmd(globalFlags, cmd, handler)(style)
 
-      case Right(ListCmdOptions) =>
-        handler.list().map { state =>
-          println("teleport points: " + fansi.Color.LightBlue(s"(total ${state.points.size})"))
-          state.points.map(_.fansi).foreach(println)
-          ExitCode.Success
-        }
-
-      case Right(cmd: RemoveCmdOptions) =>
-        handler.remove(cmd).map {
-          case Right(_) =>
-            println(s"removed teleport point [${fansi.Color.LightBlue(cmd.name)}]")
-            ExitCode.Success
-          case Left(err) =>
-            println(err.fansi)
-            ExitCode.Error
-        }
-
-      case Right(cmd: GotoCmdOptions) =>
-        handler.goto(cmd).map {
-          case Right(absolutePath) =>
-            println(absolutePath)
-            ExitCode(2)
-          case Left(err) =>
-            println(err.fansi)
-            ExitCode.Error
-        }
-
-      case Right(VersionCmdOptions) =>
-        IO(println(BuildInfo.version)) *> IO(ExitCode.Success)
-
-      case Left(e) => IO(println(s"error: ${e.toString}")) *> IO(ExitCode.Error)
+      case Left(e) =>
+        IO(println(e.toString())) *> IO(ExitCode.Error)
     }
 
     // if program has any resource they can be released here:
@@ -64,4 +38,51 @@ object Main extends IOApp {
         IO.unit
     }
   }
+
+  private def dispatchCmd(globalFlags: GlobalFlags, cmd: CmdOptions, handler: Handler)(
+      implicit style: Style): IO[ExitCode] =
+    cmd match {
+      case cmd: AddCmdOptions =>
+        handler.add(cmd).map {
+          case Right(tpPoint) =>
+            println(s"Creating teleport point: ${style.emphasis(tpPoint.name)}")
+            ExitCode.Success
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case ListCmdOptions =>
+        handler.list().map { state =>
+          if (globalFlags.headers) {
+            println("teleport points: " + style.emphasis(s"(total ${state.points.size})"))
+          }
+          state.points.map(_.fansi).foreach(println)
+          ExitCode.Success
+        }
+
+      case cmd: RemoveCmdOptions =>
+        handler.remove(cmd).map {
+          case Right(_) =>
+            println(s"removed teleport point [${style.emphasis(cmd.name)}]")
+            ExitCode.Success
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case cmd: GotoCmdOptions =>
+        handler.goto(cmd).map {
+          case Right(absolutePath) =>
+            println(absolutePath)
+            ExitCode(2)
+          case Left(err) =>
+            println(err.fansi)
+            ExitCode.Error
+        }
+
+      case VersionCmdOptions =>
+        IO(println(BuildInfo.version)) *> IO(ExitCode.Success)
+    }
+
 }

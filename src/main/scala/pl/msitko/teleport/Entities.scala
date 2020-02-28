@@ -14,7 +14,7 @@ object Codecs {
 
 @JsonCodec
 final case class TeleportPoint(name: String, absFolderPath: Path) {
-  def fansi: _root_.fansi.Str = s"$name\t" + _root_.fansi.Color.LightBlue(absFolderPath.toString())
+  def fansi(implicit s: Style): _root_.fansi.Str = s"$name\t" + s.emphasis(absFolderPath.toString())
 }
 
 @JsonCodec
