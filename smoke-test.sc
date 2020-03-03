@@ -15,7 +15,7 @@ def main(executable: String) = {
   os.makeDir(testDir)
   List("tdir_a", "tdir_b", "tdir_c").map(testDir / _).foreach(os.makeDir)
 
-  val verify = verifyExecutable(executable)
+  val verify = verifyExecutable(executable)_
 
   val tests = Tests{
     Symbol("`list` should return status code 0 if $HOME/.teleport-data does not exists") - {

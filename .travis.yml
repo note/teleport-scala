@@ -1,10 +1,10 @@
-# To great extend copied from https://github.com/remkop/picocli-native-image-maven-demo/blob/master/.travis.yml
+# Some parts copied from https://github.com/remkop/picocli-native-image-maven-demo/blob/master/.travis.yml
 jobs:
   include:
-#    - os: linux
-#      env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
-#    - os: osx
-#      env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+    - os: linux
+      env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+    - os: osx
+      env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
     - os: windows
       language: shell
       env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
@@ -16,45 +16,25 @@ branches:
     # a new tag is pushed. Version tags should be of the form: v0.1.0
     - /^v\d+\.\d+\.\d+.*$/
 
-# https://github.com/oracle/graal/issues/1852
-# https://github.com/remkop/picocli-native-image-demo/blob/master/.travis.yml
-# https://github.com/graalvm/graalvm-ce-builds/releases
-
 before_install:
-  - echo "new version"
   - if [ $TRAVIS_OS_NAME = windows ]; then choco install zip unzip ; fi
   - if [ $TRAVIS_OS_NAME = windows ]; then choco install visualstudio2017-workload-vctools ; fi
-  - if [ $TRAVIS_OS_NAME = windows ]; then /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat ; fi
-  - choco uninstall windows-sdk-10.1
-  - pwd
-  - ./ci/debug.sh
-#  - wget https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.0.0/graalvm-ce-java11-windows-amd64-20.0.0.zip
+  #- choco uninstall windows-sdk-10.1
   - curl -sL https://get.sdkman.io | bash
   - mkdir -p "$HOME/.sdkman/etc/"
   - echo sdkman_auto_answer=true > "$HOME/.sdkman/etc/config"
   - echo sdkman_auto_selfupdate=true >> "$HOME/.sdkman/etc/config"
-  - ls "$HOME/.sdkman"
   - "source $HOME/.sdkman/bin/sdkman-init.sh"
 
 install:
   - sdk install java 20.0.0.r11-grl
-  # DEBUG
-  - echo $JAVA_HOME
-  - ./ci/debug.sh
-  # DEBUG
-  # Since https://www.graalvm.org/docs/release-notes/20_0/:
-  # "Windows builds now contain the functional gu utility to install the components"
   - if [ $TRAVIS_OS_NAME != windows ]; then gu install native-image ; fi
   - if [ $TRAVIS_OS_NAME = windows ]; then gu.cmd install native-image ; fi
   - if [ $TRAVIS_OS_NAME != windows ]; then native-image --version ; fi
   - if [ $TRAVIS_OS_NAME = windows ]; then native-image.cmd --version ; fi
-  - echo $PATH
   - sdk install sbt
-  - if [ $TRAVIS_OS_NAME = windows ]; then native-image.cmd --version ; fi
 
 script:
-  - echo $PATH
-  - if [ $TRAVIS_OS_NAME = windows ]; then native-image.cmd --version ; fi
   - ./ci/script.sh
 
 deploy:
