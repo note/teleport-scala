@@ -40,7 +40,7 @@ script:
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
-  file: teleport-scala
+  file: ${RELEASED_PACKAGE_FILENAME}
   skip_cleanup: true
   on:
     tags: true
