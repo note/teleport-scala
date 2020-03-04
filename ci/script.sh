@@ -19,9 +19,10 @@ fi
 # smoke-test uses teleport-scala built above
 ./smoke-test.sh
 
+mkdir release
 
 if [ $TRAVIS_OS_NAME = windows ]; then
-  export RELEASED_PACKAGE_FILENAME="teleport-scala.exe"
+  mv teleport-scala.exe release
 else
-  export RELEASED_PACKAGE_FILENAME="teleport-scala-$TRAVIS_OS_NAME"
+  mv teleport-scala "release/teleport-scala-$TRAVIS_OS_NAME"
 fi
