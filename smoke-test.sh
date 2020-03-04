@@ -3,21 +3,26 @@
 # Exit on any failure
 set -e
 
-if [ "$TRAVIS_OS_NAME" != windows ]; then
-  docker run -it -v $(pwd)/smoke-test.sc:/root/smoke-test.sc \
-               -v $(pwd)/teleport-scala:/root/teleport-scala \
-               -v $HOME/.cache/coursier:/root/.cache/coursier \
-               lolhens/ammonite /bin/bash -c "cd /root && amm /root/smoke-test.sc teleport-scala"
-else
-  echo "Skipping teleport-scala.exe, running basic smoke test instead..."
+if [ "$TRAVIS_OS_NAME" = windows ] || [ "$TRAVIS_OS_NAME" = osx ] ; then
+  # We skip on both windowss and osx but for different reasons
+  # In case of windows it's about difficulty to programatically mount a volume
+  # In case of macos it's about lack of support for docker on travis ci
+  # The alternative would be to run non-dockerized ammonite but currently tests do some assumptions about paths
+  echo "Skipping smoke-test, running basic test instead..."
+
+  if [ "$TRAVIS_OS_NAME" = windows ] ; then
+    EXTENSION=".exe"
+  else
+    EXTENSION=""
+  fi
   
   # It does not verify a lot, mostly just that executable is not corrupted
-  OUT=`./teleport-scala.exe --no-colors list`
+  OUT=`./teleport-scala$EXTENSION --no-colors list`
 
   if [ "$OUT" != "teleport points: (total 0)" ]; then
-  	echo "unexpected output of 'teleport-scala.exe --no-colors list':"
-  	echo $OUT
-  	exit 1
+    echo "unexpected output of 'teleport-scala.exe --no-colors list':"
+    echo $OUT
+    exit 1
   fi
 
   # The following almost works, the missing part is mounting a volume
@@ -31,4 +36,10 @@ else
   #              -v $(pwd)/teleport-scala:/root/teleport-scala \
   #              -v $HOME/.cache/coursier:/root/.cache/coursier \
   #              lolhens/ammonite /bin/bash -c "cd /root && amm /root/smoke-test.sc teleport-scala.exe"
+
+else # It's run either on travis on linux or locally
+  docker run -it -v $(pwd)/smoke-test.sc:/root/smoke-test.sc \
+               -v $(pwd)/teleport-scala:/root/teleport-scala \
+               -v $HOME/.cache/coursier:/root/.cache/coursier \
+               lolhens/ammonite /bin/bash -c "cd /root && amm /root/smoke-test.sc teleport-scala"
 fi
