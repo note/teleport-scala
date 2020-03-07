@@ -4,7 +4,7 @@
 set -e
 
 if [ "$TRAVIS_OS_NAME" = windows ] || [ "$TRAVIS_OS_NAME" = osx ] ; then
-  # We skip on both windowss and osx but for different reasons
+  # We skip on both windows and osx but for different reasons
   # In case of windows it's about difficulty to programatically mount a volume
   # In case of macos it's about lack of support for docker on travis ci
   # The alternative would be to run non-dockerized ammonite but currently tests do some assumptions about paths

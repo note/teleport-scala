@@ -15,7 +15,7 @@ final case object VersionCmdOptions                                      extends
 
 object Commands {
 
-  val flags = {
+  val flags: Opts[GlobalFlags] = {
     val nocolorsOpt  = booleanFlag("no-colors", help = "Disable ANSI color codes")
     val noheadersOpt = booleanFlag("no-headers", help = "Disable printing headers for tabular data")
     (nocolorsOpt, noheadersOpt).mapN((noColors, noHeaders) => GlobalFlags(!noColors, !noHeaders))
@@ -62,7 +62,7 @@ object Commands {
       .orElse(Opts.subcommand(version))
   }
 
-  val allSubCommands: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
+  val appCmd: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
 
   private def booleanFlag(long: String, help: String): Opts[Boolean] =
     Opts.flag(long = long, help = help).map(_ => true).withDefault(false)

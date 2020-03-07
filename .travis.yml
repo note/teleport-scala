@@ -19,12 +19,11 @@ branches:
 before_install:
   - if [ $TRAVIS_OS_NAME = windows ]; then choco install zip unzip ; fi
   - if [ $TRAVIS_OS_NAME = windows ]; then choco install visualstudio2017-workload-vctools ; fi
-  #- choco uninstall windows-sdk-10.1
   - curl -sL https://get.sdkman.io | bash
   - mkdir -p "$HOME/.sdkman/etc/"
   - echo sdkman_auto_answer=true > "$HOME/.sdkman/etc/config"
   - echo sdkman_auto_selfupdate=true >> "$HOME/.sdkman/etc/config"
-  - "source $HOME/.sdkman/bin/sdkman-init.sh"
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 install:
   - sdk install java 20.0.0.r11-grl

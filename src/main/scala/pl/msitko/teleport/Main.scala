@@ -13,7 +13,7 @@ object Main extends IOApp {
     val command: Command[(GlobalFlags, CmdOptions)] = Command(
       name = "teleport-scala",
       header = "teleport: A tool to quickly switch between directories",
-      helpFlag = true)(Commands.allSubCommands)
+      helpFlag = true)(Commands.appCmd)
     val storage = new Storage(os.home / ".teleport-data")
     val handler = new Handler(storage)
 
