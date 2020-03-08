@@ -5,3 +5,5 @@ target
 *.metals
 .ammonite
 .bash_history
+teleport-scala
+teleport-scala.jar

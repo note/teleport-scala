@@ -15,7 +15,7 @@ final case object VersionCmdOptions                                      extends
 
 object Commands {
 
-  val flags = {
+  val flags: Opts[GlobalFlags] = {
     val nocolorsOpt  = booleanFlag("no-colors", help = "Disable ANSI color codes")
     val noheadersOpt = booleanFlag("no-headers", help = "Disable printing headers for tabular data")
     (nocolorsOpt, noheadersOpt).mapN((noColors, noHeaders) => GlobalFlags(!noColors, !noHeaders))
@@ -28,41 +28,31 @@ object Commands {
       Command(
         name = "add",
         header = "add a teleport point"
-      ) {
-        (nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions)
-      }
+      )((nameOpt, Opts.argument[String]("FOLDERPATH").orNone).mapN(AddCmdOptions))
 
     val list =
       Command(
         name = "list",
         header = "list all teleport points"
-      ) {
-        Opts.unit.map(_ => ListCmdOptions)
-      }
+      )(Opts.unit.map(_ => ListCmdOptions))
 
     val remove =
       Command(
         name = "remove",
         header = "remove a teleport point"
-      ) {
-        nameOpt.map(RemoveCmdOptions)
-      }
+      )(nameOpt.map(RemoveCmdOptions))
 
     val goto =
       Command(
         name = "goto",
         header = "go to a created teleport point"
-      ) {
-        nameOpt.map(GotoCmdOptions)
-      }
+      )(nameOpt.map(GotoCmdOptions))
 
     val version =
       Command(
         name = "version",
         header = "display version"
-      ) {
-        Opts.unit.map(_ => VersionCmdOptions)
-      }
+      )(Opts.unit.map(_ => VersionCmdOptions))
 
     Opts
       .subcommand(add)
@@ -72,7 +62,7 @@ object Commands {
       .orElse(Opts.subcommand(version))
   }
 
-  val allSubCommands: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
+  val appCmd: Opts[(GlobalFlags, CmdOptions)] = (flags, subcommands).tupled
 
   private def booleanFlag(long: String, help: String): Opts[Boolean] =
     Opts.flag(long = long, help = help).map(_ => true).withDefault(false)
