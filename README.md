@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/note/teleport-scala.svg?branch=master)](https://travis-ci.org/note/teleport-scala)
+[![Build Status](https://travis-ci.com/note/teleport-scala.svg?branch=master)](https://travis-ci.com/note/teleport-scala)
 [![GitHub release](https://img.shields.io/github/v/release/note/teleport-scala.svg)](https://GitHub.com/note/teleport-scala/releases/)
 
 # teleport-scala
@@ -25,7 +25,7 @@ you can:
 
 As a result `teleport-scala.jar` and executable `teleport-scala` should be created.
 
-## Bring `tp` into scope
+## Bringing `tp` into scope
 
 If you watched the asciiname animation you may have noticed that it uses `tp` command as opposed to `teleport-scala`.
 T bring `tp` into scope add the following to your `.zshrc`/`.bashrc`:
@@ -34,7 +34,9 @@ T bring `tp` into scope add the following to your `.zshrc`/`.bashrc`:
 source /your/path/to/teleport-scala/teleport.sh
 ```
 
-### For curious - what's the point of having `teleport-scala` and `tp`?
+It's crucial that executable `teleport-scala` is in the same directory as `teleport.sh` (which is the case by default after running `./build.sh`).
+
+### For curious - what's the point of having `tp` in addition to `teleport-scala`?
 
 The problem is that `goto` command cannot be fully implemented in a subprocess; it's not possible for the 
 `teleport-scala` to change working directory of the caller process. Therefore, `teleport-scala goto point` returns
