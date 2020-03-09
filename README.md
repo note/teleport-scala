@@ -28,7 +28,7 @@ As a result `teleport-scala.jar` and executable `teleport-scala` should be creat
 ## Bringing `tp` into scope
 
 If you watched the asciiname animation you may have noticed that it uses `tp` command as opposed to `teleport-scala`.
-T bring `tp` into scope add the following to your `.zshrc`/`.bashrc`:
+To bring `tp` into scope add the following to your `.zshrc`/`.bashrc`:
 
 ```
 source /your/path/to/teleport-scala/teleport.sh
