@@ -70,8 +70,8 @@ def runTests(tests: Tests): Unit = {
 }
 
 def verifyExecutable(executable: String)(arguments: List[String], expectedExitCode: Int): Vector[String] = {
-  val cmd = s"../$executable"
-  val res = os.proc(cmd :: arguments).call(cwd = os.pwd / "teleport_guinea_pig", check = false)
+  val cmd = s"../$executable" :: arguments
+  val res = os.proc(cmd).call(cwd = os.pwd / "teleport_guinea_pig", check = false)
   scala.Predef.assert(res.exitCode == expectedExitCode, s"Unexpected status code: ${res.exitCode}, expected: ${expectedExitCode} for $cmd")
   res.out.lines
 }

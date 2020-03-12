@@ -41,5 +41,5 @@ else # It's run either on travis on linux or locally
   docker run -it -v $(pwd)/smoke-test.sc:/root/smoke-test.sc \
                -v $(pwd)/teleport-scala:/root/teleport-scala \
                -v $HOME/.cache/coursier:/root/.cache/coursier \
-               lolhens/ammonite /bin/bash -c "cd /root && amm /root/smoke-test.sc teleport-scala"
+               note/ammonite:2.13-2.0.4 /bin/bash -c "cd /root && amm /root/smoke-test.sc teleport-scala"
 fi
