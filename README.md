@@ -6,7 +6,7 @@
 A clone of [teleport](https://github.com/bollu/teleport) written in Scala as a showcase that writing native CLIs in Scala
 might not be such a bad idea.
 
-[![asciicast](https://asciinema.org/a/Zj1ZDAgF02PP3JpD5RNtwBz0M.svg)](https://asciinema.org/a/Zj1ZDAgF02PP3JpD5RNtwBz0M)
+[![asciicast](https://asciinema.org/a/310481.svg)](https://asciinema.org/a/310481)
 
 ## How to build teleport-scala
 
